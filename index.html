@@ -1568,7 +1568,8 @@
     const guestSuccessSounds = {
       3: new Audio('sounds/guest3-success.mp3'),
       5: new Audio('sounds/guest5-success.mp3'),
-      14: new Audio('sounds/guest14-success.mp3')
+      14: new Audio('sounds/guest14-success.mp3'),
+      19: new Audio('sounds/guest19-appear.mp3')
     };
 
     function playGuestSuccessSound(guestNumber) {
@@ -1650,6 +1651,9 @@
       resetHiddenItems();
 
       currentCustomerIndex = Math.floor(Math.random() * 25) + 1;
+      if (currentCustomerIndex === 19) {
+    playGuestSuccessSound(19);
+}
       customerImg.src = GUEST_IMAGES[currentCustomerIndex];
 
       const guestObj = GUEST_DATA[currentCustomerIndex];
