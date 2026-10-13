@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>서 가네 떡볶이 타이쿤</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gamja+Flower&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #333333;
+      --panel: #f4f4f1;
+      --surface: #ffffff;
+      --line: #c9c9c4;
+      --accent: #555955;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: '굴림', 'Gulim', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #e6e6e2 !important;
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      width: 100% !important;
+      max-width: 1500px !important;
+      height: 100dvh;
+      min-height: 100dvh;
+      background: #eeeeeb !important;
+      background-image: url('game-background.png') !important;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      border: 0 !important;
+      border-radius: 0 !important;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      box-shadow: none !important;
+      overflow: hidden;
+    }
+
+    /* ===== 로비 화면 ===== */
+    .lobby-screen {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      transition: opacity 0.3s ease;
+      padding: 0 !important;
+      text-align: center;
+      overflow: hidden;
+      border: 0;
+    }
+
+    .lobby-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .lobby-screen .lobby-title,
+    .lobby-screen .lobby-subtitle,
+    .lobby-screen .lobby-credits { 
+      display: none !important; 
+    }
+
+    .lobby-screen .main-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .lobby-screen .tasty-image {
+      position: absolute;
+      z-index: 1;
+      top: 15%;
+      left: 35%;
+      width: min(32vw, 340px);
+      max-width: 45%;
+      height: auto;
+      object-fit: contain;
+      transform: translateX(-50%);
+      transform-origin: center;
+      animation: tasty-pulse 1.35s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes tasty-pulse {
+      0%, 100% { transform: translateX(-50%) scale(0.92); }
+      50% { transform: translateX(-50%) scale(1.08); }
+    }
+
+    .lobby-screen .start-image-button {
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      bottom: 8%;
+      width: min(34vw, 360px);
+      max-width: 58%;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      line-height: 0;
+      transform: translateX(-50%) scale(1);
+      transform-origin: center;
+      transition: transform .18s ease, filter .18s ease;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .lobby-screen .start-image-button img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .lobby-screen .start-image-button:hover {
+      transform: translateX(-50%) scale(1.09);
+      filter: brightness(1.06);
+    }
+
+    .lobby-screen .start-image-button:active {
+      transform: translateX(-50%) scale(1.15);
+    }
+
+    /* ===== 게임 방법 화면 ===== */
+    #howto-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 210;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    #howto-screen.active { display: flex; }
+
+    #howto-screen .howto-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+    }
+
+    #howto-screen .continue-button {
+      position: absolute;
+      z-index: 1;
+      right: 5%;
+      bottom: 5%;
+      width: min(24vw, 250px);
+      min-width: 0;
+      height: auto;
+      aspect-ratio: 3 / 1;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      background: transparent;
+      transition: transform .18s ease;
+      cursor: pointer;
+    }
+
+    #howto-screen .continue-button.no-image {
+      width: auto;
+      min-width: 150px;
+      aspect-ratio: auto;
+      padding: 14px 28px;
+      border: none !important;
+      border-radius: 8px;
+      background: transparent !important;
+      color: #292923;
+      box-shadow: none !important;
+      font-size: clamp(16px, 2vw, 24px);
+      font-weight: 800;
+    }
+
+    #howto-screen .continue-button:hover { transform: scale(1.07); }
+    #howto-screen .continue-button:active { transform: scale(1.12); }
+
+    /* ===== 상단 헤더 & 상태창 ===== */
+    .header {
+      width: 100%;
+      min-height: 58px;
+      padding: 8px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      flex: 0 0 auto;
+      background: transparent !important;
+      background-image: url('images/game-header.png') !important;
+      background-position: center;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      border: 0 !important;
+      color: #fff !important;
+    }
+
+    .status-bar {
+      display: flex;
+      gap: 8px;
+    }
+
+    .status-item {
+      padding: 5px 10px;
+      font-size: 13px;
+      background: transparent !important;
+      background-image: url('images/status-box.png') !important;
+      background-size: 100% 100% !important;
+      background-repeat: no-repeat !important;
+      border: 0 !important;
+      border-radius: 3px !important;
+      box-shadow: none !important;
+      color: #f7f7f4 !important;
+    }
+
+    .status-item span {
+      color: #ffe28a;
+      font-size: 16px;
+    }
+
+    /* ===== 게임 레이아웃 ===== */
+    .game-main-layout {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background: transparent !important;
+    }
+
+    /* 손님 영역 */
+    .left-customer-panel {
+      position: relative;
+      flex: 0 0 29% !important;
+      min-height: 205px;
+      width: 100%;
+      padding: 12px 18px 8px;
+      padding-right: 0 !important;
+      display: grid;
+      grid-template-columns: minmax(145px, 20%) minmax(0, 1fr);
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      gap: 8px 16px;
+      overflow: hidden;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .left-customer-panel::before { display: none !important; }
+
+    .customer-wrapper {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      max-width: 210px;
+      margin: 0 !important;
+      display: flex;
+      align-items: center !important;
+      justify-content: center !important;
+      justify-self: center;
+      position: relative;
+    }
+
+    .customer-img {
+      width: 100%;
+      height: 100%;
+      max-height: 205px;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 5px 2px #0002);
+    }
+
+    .customer-name {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #373a39 !important;
+      color: #fff !important;
+      padding: 4px 12px;
+      border-radius: 3px !important;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .speech-bubble {
+      grid-column: 2;
+      grid-row: 1;
+      width: 100%;
+      height: auto;
+      min-height: 74px;
+      margin: 16px 0 0;
+      padding: 12px 16px;
+      border: 0 !important;
+      border-radius: 5px !important;
+      background-color: transparent !important;
+      background-image: url('speech-bubble.png') !important;
+      background-size: 100% 100% !important;
+      background-repeat: no-repeat !important;
+      box-shadow: none !important;
+      color: #303230 !important;
+      font-size: clamp(14px, 1.8vw, 19px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.35;
+      position: relative;
+    }
+
+    .speech-bubble::before, .speech-bubble::after { display: none !important; }
+
+    .dialogue-options {
+      grid-column: 2;
+      grid-row: 2;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-start;
+      height: auto;
+      margin: 0 0 6px;
+      z-index: 20;
+    }
+
+    .dialogue-options.hidden-options {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* 주방 영역 */
+    .right-kitchen-panel {
+      flex: 1 1 71%;
+      min-height: 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(230px, .7fr) minmax(0, 1.65fr) !important;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 14px 22px;
+      padding: 26px 26px 18px;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .right-kitchen-panel::before { display: none !important; }
+
+    
+.kitchen-top-row {
+  position: relative;
+  left: -60px;
+  top: -20px;
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  margin: 0;
+  padding: 18px 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+    
+.pot-stage {
+  width: min(100%, 900px);
+  height: 100%;
+  min-height: 300px;
+  max-height: 540px;
+  flex: 1;
+  position: relative;
+  left: -40px;
+  top: -30px;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible;
+}
+
+
+
+.main-tteokbokki-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  filter: none !important;
+  transform: translate(-170px, -20px);
+  transition: opacity .12s ease, transform .16s ease;
+  pointer-events: none;
+}
+
+.pot-stage.drag-over .main-tteokbokki-img {
+  transform: translate(-170px, -20px) scale(1.025);
+  filter: drop-shadow(0 0 8px #777) !important;
+}
+
+    .food-layer {
+      position: absolute;
+      left: calc(18% -150px);
+  top: calc(17% -20px);
+      width: 64%;
+      height: 62%;
+      pointer-events: none;
+    }
+
+    .food-piece {
+      position: absolute;
+      width: clamp(38px, 5vw, 72px);
+      height: clamp(38px, 5vw, 72px);
+      object-fit: contain;
+      filter: none !important;
+      transform: translate(-50%, -50%);
+      animation: ingredientPop .18s ease-out;
+    }
+
+    @keyframes ingredientPop {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(.45) rotate(-15deg); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+    }
+
+    .drop-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 1%;
+      transform: translateX(-50%);
+      color: #fff !important;
+      background: #444745 !important;
+      padding: 7px 12px;
+      border: 0 !important;
+      border-radius: 3px !important;
+      font-size: 14px;
+      pointer-events: none;
+      opacity: .85;
+      white-space: nowrap;
+      box-shadow: none !important;
+    }
+
+    .pot-stage.has-items .drop-hint { display: none; }
+
+    /* 찬장 재료 목록 */
+    .kitchen-objects-area {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: stretch;
+      align-content: stretch;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 8px;
+      padding: 34px 12px 12px;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .kitchen-objects-area::before { display: none !important; }
+
+    .kitchen-object {
+      min-width: 0;
+      min-height: 120px;
+      padding: 5px 2px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0;
+      position: relative;
+      overflow: visible;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      filter: none !important;
+      cursor: grab;
+      touch-action: none;
+      transition: transform .12s;
+    }
+
+    .kitchen-object::before {
+      content: '' !important;
+      position: absolute;
+      z-index: 0;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      width: min(100%, 132px);
+      height: 66px;
+      background-repeat: no-repeat !important;
+      background-position: center !important;
+      background-size: contain !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .kitchen-object[data-ingredient="물"]::before,
+    .kitchen-object[data-ingredient="소스"]::before,
+    .kitchen-object[data-ingredient="떡"]::before,
+    .kitchen-object[data-ingredient="어묵"]::before,
+    .kitchen-object[data-ingredient="파"]::before,
+    .kitchen-object[data-ingredient="치즈"]::before,
+    .kitchen-object[data-ingredient="계란"]::before,
+    .kitchen-object[data-ingredient="토마토"]::before {
+      background-image: url('bowl.png') !important;
+    }
+
+    .kitchen-object img {
+      position: relative;
+      z-index: 1;
+      width: clamp(72px, 8vw, 112px) !important;
+      height: clamp(72px, 8vw, 112px) !important;
+      object-fit: contain;
+      filter: none !important;
+      margin: 0 auto -1px;
+      pointer-events: none;
+    }
+
+    .kitchen-object span {
+      position: relative;
+      z-index: 2;
+      align-self: center;
+      margin-top: 0;
+      padding: 2px 10px;
+      color: #303230 !important;
+      font-size: 14px;
+      background: #eeeeea !important;
+      border: 1px solid #d0d0ca;
+      border-radius: 3px !important;
+      text-shadow: none !important;
+      pointer-events: none;
+    }
+
+    .kitchen-object:active { transform: scale(.96); }
+    .kitchen-object.drag-source { opacity: .55; }
+
+    .kitchen-object.hidden-item {
+      display: none;
+    }
+
+    .kitchen-object.hidden-item.show {
+      display: flex;
+      animation: popIn 0.5s ease-out forwards;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 하단 버튼 영역 */
+    .action-row {
+      display: flex !important;
+      position: relative !important;
+      grid-column: 1 / -1 !important;
+      grid-row: 2 !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 5px !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 5px 0 0 !important;
+      left: 30px !important;
+      top: -20px !important;
+      transform: none !important;
+    }
+
+    /* 커스텀 이미지 버튼 공통 */
+    .image-button {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 4px !important;
+      background: #555955 !important;
+      color: #fff !important;
+      box-shadow: none !important;
+      line-height: 0;
+      overflow: visible;
+      transition: transform .16s ease, filter .16s ease;
+      cursor: pointer;
+    }
+
+    .image-button > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .image-button > span { display: none; }
+
+    .image-button.no-image > span {
+      display: block;
+      font: inherit;
+      font-size: 16px;
+      line-height: 1.2;
+      padding: 12px 18px;
+      white-space: nowrap;
+    }
+
+    .image-button:hover { transform: scale(1.07); filter: brightness(1.06); }
+    .image-button:active { transform: scale(1.12); }
+    .image-button:focus-visible { outline: 3px solid #ffe28a; outline-offset: 4px; }
+
+    .dialogue-options .image-button { width: clamp(70px, 9vw, 120px); height: clamp(38px, 5vw, 62px); }
+    .action-row .image-button { min-width: 0; height: clamp(42px, 6vw, 72px); }
+    .modal-btn-group .image-button { min-width: 0; min-height: 50px; width: 100%; }
+    .modal-btn-group .image-button.no-image { min-height: 0; }
+
+    /* 드래그 이펙트 */
+    .drag-ghost {
+      position: fixed;
+      z-index: 9999;
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(1.12);
+      filter: drop-shadow(0 3px 2px #0003) !important;
+    }
+
+    .drag-halo {
+      position: fixed;
+      z-index: 9998;
+      width: 128px;
+      height: 128px;
+      border: 2px solid #fff !important;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 5px #3332 !important;
+    }
+
+    .pop-effect {
+      position: absolute;
+      font-size: 20px;
+      font-weight: bold;
+      pointer-events: none;
+      animation: popUp 0.8s ease-out forwards;
+      z-index: 30;
+    }
+
+    @keyframes popUp {
+      0% { opacity: 1; transform: translateY(0) scale(0.8); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+    }
+
+    /* ===== 결과 모달 ===== */
+    .modal {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 100; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active { opacity: 1; pointer-events: auto; }
+
+    .modal-card {
+      background: #f7f7f4 !important;
+      background-image: url('result-panel.png') !important;
+      background-size: 100% 100% !important;
+      background-repeat: no-repeat !important;
+      border: 1px solid #c9c9c4 !important;
+      border-radius: 5px !important;
+      padding: 22px;
+      width: 75%;
+      max-width: 460px;
+      text-align: center;
+      box-shadow: none !important;
+    }
+
+    .modal-card h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .coupon-box {
+      border: 2px dashed #e76f51;
+      background-color: transparent !important;
+      background-image: url('coupon-box.png') !important;
+      background-size: 100% 100% !important;
+      background-repeat: no-repeat !important;
+      border-color: transparent !important;
+      border-radius: 14px;
+      padding: 10px;
+      margin: 12px 0;
+    }
+
+    .modal-btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn-group button { flex: 1; }
+
+    /* ===== 반응형 미디어 쿼리 ===== */
+    @media(max-width: 760px) {
+      #game-container { height: 100dvh; min-height: 700px; }
+      .left-customer-panel {
+        padding-right: 0 !important;
+        flex-basis: 39% !important;
+        min-height: 310px !important;
+        grid-template-columns: 92px minmax(0, 1fr) !important;
+      }
+      .customer-img { max-height: 155px; }
+      .speech-bubble { margin-top: 15px; font-size: 13px; padding: 8px; min-height: 55px; }
+      .right-kitchen-panel {
+        grid-template-columns: minmax(108px, .72fr) minmax(0, 1.4fr) !important;
+        padding: 18px 7px 8px !important;
+        gap: 6px;
+      }
+      .kitchen-objects-area { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 2px; padding: 27px 3px 5px; }
+      .kitchen-object { min-height: 92px; padding: 2px 0; }
+      .kitchen-object::before { bottom: 20px; width: 96%; height: 42px; }
+      .kitchen-object img { width: clamp(48px, 12vw, 76px) !important; height: clamp(48px, 12vw, 76px) !important; }
+      .kitchen-object span { font-size: 10px; padding: 1px 6px; }
+      .kitchen-top-row { padding: 20px 0 4px; }
+      .pot-stage { min-height: 210px; }
+      .food-layer { left: 15%; top: 20%; width: 70%; height: 58%; }
+      .food-piece { width: clamp(25px, 7vw, 44px); height: clamp(25px, 7vw, 44px); }
+      .drop-hint { white-space: normal; width: 84%; text-align: center; font-size: 10px; }
+      .action-row { left: 44% !important; right: 25% !important; bottom: 2% !important; width: 30% !important; gap: 4px !important; }
+      .action-row .image-button { height: 34px !important; }
+      .drag-ghost { width: 82px; height: 82px; }
+      .drag-halo { width: 98px; height: 98px; }
+      #howto-screen .continue-button { width: 35vw; max-width: 180px; }
+      .dialogue-options .image-button { width: 76px; height: 42px; }
+      .action-row .image-button { height: 42px; }
+    }
+  
+
+    /* ===== 화면 비율 고정 + 손님 원본 이미지 유지 ===== */
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+
+    body {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    #game-container {
+      position: fixed !important;
+      left: 50% !important;
+      top: 50% !important;
+      width: min(100vw, 177.7778dvh) !important;
+      height: min(56.25vw, 100dvh) !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      max-width: none !important;
+      aspect-ratio: 16 / 9 !important;
+      flex: none !important;
+      overflow: hidden !important;
+      transform: translate(-50%, -50%) !important;
+      transform-origin: center center !important;
+    }
+
+    /* 세로 기기에서는 게임 전체를 90도 회전해 가로 플레이 화면으로 표시 */
+    @media (orientation: portrait) {
+      #game-container {
+        width: min(100dvh, 177.7778dvw) !important;
+        height: min(56.25dvh, 100dvw) !important;
+        transform: translate(-50%, -50%) rotate(90deg) !important;
+      }
+    }
+
+    .left-customer-panel {
+      grid-template-columns: minmax(210px, 32%) minmax(0, 1fr) !important;
+      min-height: 0 !important;
+    }
+
+    .customer-wrapper {
+      width: 100% !important;
+      max-width: 330px !important;
+      min-width: 0 !important;
+    }
+
+    .customer-img {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: none !important;
+      object-fit: contain !important;
+      mix-blend-mode: normal !important;
+      filter: none !important;
+      background: transparent !important;
+    }
+
+
+    /* ===== 새 배경 배치: 위쪽 가로 선반 / 왼쪽 철판 / 오른쪽 손님 ===== */
+    #game-container {
+      background-image: url('game-background.png') !important;
+      background-position: center center !important;
+      background-size: 100% 100% !important;
+    }
+
+    .header {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 7.5% !important;
+      height: 7.5% !important;
+      padding: 4px 14px !important;
+      z-index: 50;
+    }
+
+    .game-main-layout {
+      position: absolute !important;
+      inset: 7.5% 0 0 0 !important;
+      width: 100% !important;
+      height: 92.5% !important;
+      display: block !important;
+      overflow: hidden !important;
+    }
+
+    .right-kitchen-panel {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      pointer-events: none;
+    }
+
+    /* 선반: 재료를 한 줄로 나열 */
+    .kitchen-objects-area {
+      position: absolute !important;
+      left: calc(7% + 100px) !important;
+      top: 0.5% !important;
+      width: 68% !important;
+      height: 25% !important;
+      padding: 0 1% !important;
+      display: grid !important;
+      grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+      grid-template-rows: minmax(0, 1fr) !important;
+      align-items: center !important;
+      align-content: center !important;
+      column-gap: 1.8% !important;
+      row-gap: 0 !important;
+      pointer-events: auto;
+    }
+
+    .kitchen-object {
+      min-width: 0 !important;
+      min-height: 0 !important;
+      height: 100% !important;
+      padding: 0 !important;
+      justify-content: center !important;
+      align-items: center !important;
+      overflow: visible !important;
+    }
+
+    .kitchen-object::before {
+      bottom: 13% !important;
+      width: 95% !important;
+      height: 48% !important;
+    }
+
+    .kitchen-object img {
+      width: min(100%, 8vw) !important;
+      height: 67% !important;
+      object-fit: contain !important;
+      margin: 0 auto !important;
+    }
+
+    .kitchen-object span {
+      font-size: clamp(9px, 1vw, 14px) !important;
+      padding: 1px 4px !important;
+      margin-top: -1px !important;
+    }
+
+    /* 철판: 왼쪽 아래 불 그림 위 */
+    .kitchen-top-row {
+      position: absolute !important;
+      left: 0% !important;
+      top: 40% !important;
+      width: 42% !important;
+      height: 54% !important;
+      min-height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: block !important;
+      pointer-events: none;
+    }
+
+    .pot-stage {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      pointer-events: auto;
+    }
+
+    .main-tteokbokki-img {
+      object-fit: contain !important;
+      object-position: center center !important;
+    }
+
+    .food-layer {
+      left: 18% !important;
+      top: 17% !important;
+      width: 64% !important;
+      height: 62% !important;
+    }
+
+    /* 손님: 화면 오른쪽 */
+    .left-customer-panel {
+      position: absolute !important;
+      right: 0 !important;
+      top: 28% !important;
+      width: 39% !important;
+      height: 72% !important;
+      min-height: 0 !important;
+      padding: 0 !important;
+      display: block !important;
+      overflow: visible !important;
+      pointer-events: none;
+    }
+
+    .customer-wrapper {
+      position: absolute !important;
+      right: 4% !important;
+      bottom: 0 !important;
+      width: 68% !important;
+      height: 91% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      pointer-events: none;
+    }
+
+    .customer-img {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      object-fit: contain !important;
+      object-position: bottom center !important;
+    }
+
+    .customer-name { bottom: 2% !important; }
+
+    /* 주문 말풍선은 선반 근처에 표시. 확인 후에는 기존 JS가 숨김 처리 */
+    .speech-bubble {
+      position: absolute !important;
+      left: auto !important;
+      right: 2% !important;
+      top: -25% !important;
+      width: 23% !important;
+      min-height: 72px !important;
+      height: 22% !important;
+      margin: 0 !important;
+      padding: 10px 14px !important;
+      z-index: 40 !important;
+      pointer-events: auto;
+      font-size: clamp(12px, 1.25vw, 19px) !important;
+    }
+
+    .dialogue-options {
+      position: absolute !important;
+      left: auto !important;
+      right: 2% !important;
+      top: 1% !important;
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 6px !important;
+      z-index: 45 !important;
+      pointer-events: auto;
+    }
+
+    .dialogue-options .image-button {
+      width: clamp(56px, 6vw, 88px) !important;
+      height: clamp(30px, 3.6vw, 48px) !important;
+    }
+
+    /* 비우기 / 서빙 버튼: 철판 옆으로 가로 배치 */
+    .action-row {
+      position: absolute !important;
+      left: 43% !important;
+      right: 25% !important;
+      bottom: 2% !important;
+      top: auto !important;
+      width: 30% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 10px !important;
+      z-index: 35 !important;
+      transform: none !important;
+      pointer-events: auto !important;
+    }
+
+    .action-row .image-button {
+      flex: 0 1 46% !important;
+      width: 46% !important;
+      min-width: 0 !important;
+      height: clamp(34px, 5vw, 58px) !important;
+    }
+
+    /* 드래그 중에도 선반과 철판을 조작할 수 있게 유지 */
+    .kitchen-objects-area, .pot-stage { pointer-events: auto !important; }
+
+    @media (max-width: 760px) {
+      .kitchen-objects-area {
+        left: 7% !important;
+        width: 68% !important;
+        height: 24% !important;
+        padding: 0 !important;
+        grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
+        gap: 0 !important;
+      }
+      .kitchen-object img { width: 100% !important; height: 62% !important; }
+      .kitchen-object span { font-size: clamp(7px, 1.5vw, 10px) !important; padding: 1px 2px !important; }
+      .kitchen-top-row { left: 0% !important; top: 41% !important; width: 44% !important; height: 52% !important; }
+      .left-customer-panel { top: 30% !important; width: 40% !important; height: 70% !important; }
+      .customer-wrapper { right: 1% !important; width: 75% !important; height: 85% !important; }
+      .speech-bubble { left: auto !important; right: 2% !important; top: -25% !important; width: 23% !important; min-height: 48px !important; height: 22% !important; padding: 5px !important; font-size: 10px !important; }
+      .dialogue-options { left: auto !important; right: 2% !important; top: 1% !important; gap: 3px !important; }
+      .dialogue-options .image-button { width: 52px !important; height: 29px !important; }
+    }
+
+
+
+
+
+
+    /* 철판 위 재료는 원래 위치로 유지하고, 위쪽 선반 재료만 오른쪽으로 이동 */
+    .food-layer {
+      transform: none !important;
+    }
+    .speech-bubble {
+      position: absolute !important;
+      left: 1% !important;
+      right: auto !important;
+      top: 2% !important;
+      width: 48% !important;
+      min-height: 144px !important;
+      height: 44% !important;
+      padding: 20px 28px !important;
+      margin: 0 !important;
+      transform: none !important;
+      font-size: clamp(18px, 2.5vw, 30px) !important;
+      z-index: 40 !important;
+    }
+    .customer-wrapper {
+      transform: translateY(-30px) !important;
+    }
+    /* 말풍선 아래에 선택 버튼을 따로 배치해 서로 겹치지 않도록 함 */
+    .dialogue-options {
+      position: absolute !important;
+      left: 2% !important;
+      right: auto !important;
+      top: 48% !important;
+      z-index: 45 !important;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      gap: 8px !important;
+      max-width: 46% !important;
+    }
+    .dialogue-options .image-button {
+      flex: 0 1 auto !important;
+      max-width: 100% !important;
+    }
+    @media (max-width: 760px) {
+      .dialogue-options {
+        top: 48% !important;
+        left: 2% !important;
+        right: auto !important;
+        max-width: 46% !important;
+        gap: 4px !important;
+      }
+    }
+
+</style>
+</head>
+
+<body>
+
+  <div id="game-container">
+
+    <!-- 로비 화면 -->
+    <div class="lobby-screen" id="lobby-screen">
+      <img class="main-background" src="main.png" alt="메인 화면 배경">
+      <img class="tasty-image" src="tasty.png" alt="맛있음!">
+      <button class="start-image-button" type="button" onclick="startGame()" aria-label="게임 시작">
+        <img src="start-button.png" alt="게임 시작">
+      </button>
+    </div>
+
+    <!-- 게임 방법 화면 -->
+    <div id="howto-screen" aria-label="게임 방법">
+      <img class="howto-background" src="howto.png" alt="게임 방법 안내">
+      <button class="continue-button image-button" type="button" onclick="continueToGame()" aria-label="넘어가기">
+        <img src="start-button.png" alt="넘어가기" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
+        <span>넘어가기 ▶</span>
+      </button>
+    </div>
+
+    <!-- 게임 상단 헤더 -->
+    <div class="header">
+      <div class="status-bar">
+        <div class="status-item">남은시간: <span id="time-left">100</span>초</div>
+        <div class="status-item">점수: <span id="score">0</span></div>
+      </div>
+    </div>
+
+    <!-- 메인 게임 영역 -->
+    <div class="game-main-layout">
+      
+      <!-- 좌측 손님 패널 -->
+      <div class="left-customer-panel">
+        <div class="speech-bubble" id="speech-bubble">손님의 주문 대사</div>
+        <div class="dialogue-options" id="dialogue-options">
+          <button class="opt-btn pardon image-button" onclick="askPardon()" aria-label="네?">
+            <img src="button-pardon.png" alt="네?" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');"><span>네?</span>
+          </button>
+          <button class="opt-btn ok image-button" onclick="confirmOrder()" aria-label="오케이">
+            <img src="button-ok.png" alt="오케이" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');"><span>오케이</span>
+          </button>
+        </div>
+        <div class="customer-wrapper">
+          <img id="customer-img" class="customer-img" src="guest12.png" alt="손님" onerror="this.style.opacity='0'">
+          <div class="customer-name" id="customer-name">손님</div>
+        </div>
+      </div>
+
+      <!-- 우측 조리 패널 -->
+      <div class="right-kitchen-panel">
+        <div class="kitchen-top-row">
+          <div class="pot-stage" id="pot-area">
+            <img id="main-img" class="main-tteokbokki-img" src="bim.png" alt="빈 철판">
+            <div id="food-layer" class="food-layer" aria-label="철판 위 재료"></div>
+            <span class="drop-hint">찬장에서 재료를 집어 철판으로 옮겨 주세요</span>
+          </div>
+        </div>
+
+        <!-- 찬장 재료 -->
+        <div class="kitchen-objects-area">
+          <div class="kitchen-object" data-ingredient="물"><img src="water.png" alt="물"><span>물</span></div>
+          <div class="kitchen-object" data-ingredient="소스"><img src="sauce.png" alt="소스"><span>소스</span></div>
+          <div class="kitchen-object" data-ingredient="떡"><img src="tteok.png" alt="떡"><span>떡</span></div>
+          <div class="kitchen-object" data-ingredient="어묵"><img src="eomuk.png" alt="어묵"><span>어묵</span></div>
+          <div class="kitchen-object" data-ingredient="파"><img src="pa.png" alt="파"><span>파</span></div>
+          <div class="kitchen-object" data-ingredient="치즈"><img src="cheese.png" alt="치즈"><span>치즈</span></div>
+
+          <div class="kitchen-object hidden-item" id="hidden-egg-btn" data-ingredient="계란">
+            <img src="egg.png" alt="계란"><span>계란</span>
+          </div>
+          <div class="kitchen-object hidden-item" id="hidden-tomato-btn" data-ingredient="토마토">
+            <img src="tomato.png" alt="토마토"><span>토마토</span>
+          </div>
+        </div>
+
+        <!-- 조리 조작 버튼 -->
+        <div class="action-row">
+          <button class="act-btn reset image-button" onclick="resetPot()" aria-label="비우기">
+            <img src="button-clear.png" alt="비우기" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');"><span>비우기</span>
+          </button>
+          <button class="act-btn submit image-button" onclick="serveOrder()" aria-label="서빙하기">
+            <img src="button-serve.png" alt="서빙하기" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');"><span>서빙하기</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 결과 모달 창 -->
+    <div class="modal" id="result-modal">
+      <div class="modal-card">
+        <h2>RESULT</h2>
+        <p>만족시킨 손님: <strong id="served-count" style="color: #e76f51; font-size: 20px;">0</strong>명</p>
+        <p>최종 점수: <strong id="final-score" style="color: #e76f51; font-size: 22px;">0</strong>점</p>
+
+        <div class="coupon-box">
+          <h3 style="margin: 2px 0; color: #ffffff; font-size: 16px;">매장 방문 쿠폰</h3>
+        </div>
+
+        <div class="modal-btn-group">
+          <button class="restart-btn image-button" onclick="startGameFromModal()" aria-label="다시 시작하기">
+            <img src="button-restart.png" alt="다시 시작하기" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');"><span>다시 시작하기</span>
+          </button>
+          <button class="lobby-back-btn image-button" onclick="goToLobby()" aria-label="시작 화면으로 돌아가기">
+            <img src="button-lobby.png" alt="시작 화면으로 돌아가기" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');"><span>시작 화면으로 돌아가기</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let audioCtx = null;
+
+    function playNote(freq, duration = 0.4, delay = 0) {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        setTimeout(() => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        }, delay * 1000);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    const NOTE_FA = 349.23;
+    const NOTE_DO = 523.25;
+
+    const INGREDIENT_IMAGES = {
+      '물': 'water.png', '소스': 'sauce.png', '떡': 'tteok.png',
+      '어묵': 'eomuk.png', '파': 'pa.png', '치즈': 'cheese.png',
+      '계란': 'egg.png', '토마토': 'tomato.png'
+    };
+
+    const GUEST_IMAGES = {};
+    for (let i = 1; i <= 25; i++) {
+      GUEST_IMAGES[i] = `guest${i}.png`;
+    }
+
+    let score = 0, servedCount = 0, timeLeft = 100, timer = null, isPlaying = false, isCookingMode = false;
+    let dialogueStep = 0, currentCustomerIndex = 1, currentSelectedKey = 'A';
+    let currentCustomerPattern = null, currentPot = [];
+
+    let eggUnlocked = false, tomatoUnlocked = false;
+
+    const scoreEl = document.getElementById('score'), timeLeftEl = document.getElementById('time-left');
+    const customerImg = document.getElementById('customer-img'), speechBubble = document.getElementById('speech-bubble');
+    const dialogueOptions = document.getElementById('dialogue-options');
+    const potArea = document.getElementById('pot-area'), resultModal = document.getElementById('result-modal');
+    const finalScoreEl = document.getElementById('final-score'), servedCountEl = document.getElementById('served-count');
+    const lobbyScreen = document.getElementById('lobby-screen');
+    const mainImg = document.getElementById('main-img');
+    const hiddenEggBtn = document.getElementById('hidden-egg-btn'), hiddenTomatoBtn = document.getElementById('hidden-tomato-btn');
+
+    const GUEST_DATA = {
+      1: {
+        A: { target: { '물': 3, '소스': 3, '떡': 3, '어묵': 3, '치즈': 3, '파': 3 }, dialogues: ["떡볶이 있어~? 튀김이랑 김말이도.", "나 삼 인분 먹을래.", "기본 재료가 전부 들어간 떡볶이로~ 치즈 추가해서…… 3인분."], successDialogue: "고마워~ 맛있게 먹을게.", failDialogue: "이거, 내가 주문한 떡볶이랑 다르지 않아~?" },
+        B: { target: { '물': 1, '소스': 1, '어묵': 3, '파': 1 }, dialogues: ["안녕~ 오늘은 왠지 색다른 떡볶이를 먹고 싶어.", "떡 없이 어묵만 가득한 떡볶이.", "아, 파가 들어가면 좋을지도~?"], successDialogue: "고마워~ 맛있게 먹을게.", failDialogue: "이거, 내가 주문한 떡볶이랑 다르지 않아~?" }
+      },
+      2: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '파': 1 }, dialogues: ["떡볶이 1인분 부탁해도 될까.", "기본 떡볶이로… 아무것도 빼거나 더하지 말고.", "떡 하나, 어묵 하나, 파 하나, 소스 하나, 물 하나… …더 필요해?"], successDialogue: "고맙다... 맛있네.", failDialogue: "이거… … 아니다. 잘 먹을게…" },
+        B: { target: { '물': 1, '소스': 1, '떡': 1, '파': 2, '어묵': 1, '치즈': 1 }, dialogues: ["치즈 떡볶이 하나 포장해 줄래. 집 가서 먹을 거라…", "나는 단 걸 좋아해.", "…파가 두 번 들어가면 좋겠어."], successDialogue: "고맙다... 맛있네.", failDialogue: "이거… … 아니다. 잘 먹을게…" }
+      },
+      3: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1 }, dialogues: ["치즈 떡볶이인데, 치즈는 빼 다오! 그리고 하나 더.", "♪~ *잘 들어보자.", "내가 뭘 빼달라고 했더라? 치즈였지! ♪~ ♪~"], successDialogue: "하하핫, 소문대로 맛있구나!", failDialogue: "들은 것보다 아쉬운 맛이군?" },
+        B: { target: { '물': 1, '어묵': 1, '파': 1 }, dialogues: ["어묵 국물이 목에 아주 좋다던데. 들어봤어?", "그러고 보니 떡볶이에서 소스와 떡만 빼면 어묵 국물일 것 같지 않아?", "기억해 줘. 소스랑 떡은 안 돼!"], successDialogue: "하하핫, 소문대로 맛있구나!", failDialogue: "들은 것보다 아쉬운 맛이군?" }
+      },
+      4: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '파': 3 }, dialogues: ["나는 파의 알싸한 맛이 좋더라구~ 파 엄청 많이 부탁해!", "떡 1개에 파를 무려 3개나 넣어달라는 뜻이야아.", "어묵 없이 파 3개! 떡 1개! 파가 메인!"], successDialogue: "이얏호~!! 믿고 있었어!!!", failDialogue: "신기한 맛인걸~ 다시 먹으라면 사양이지만!!" },
+        B: { target: { '물': 1, '소스': 5, '떡': 1, '어묵': 1, '치즈': 1, '파': 1 }, dialogues: ["입안에서 펑펑! 터지는 떡볶이는 없을까?", "이를테면 1인분 5소스 같은~", "소스 다섯 개에 나머지 재료 하나씩이야!"], successDialogue: "이얏호~!! 믿고 있었어!!!", failDialogue: "신기한 맛인걸~ 다시 먹으라면 사양이지만!!" }
+      },
+      5: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '치즈': 2, '파': 1 }, dialogues: ["치즈가 쭉쭉~ 늘어나는 떡볶이를 먹고 싶어!", "응응. 떡볶이에 치즈 2개 올려 줘!", "나는 파도 잘 먹으니까 잊으면 안 돼~"], successDialogue: "음음. 맛있다~", failDialogue: "그대가 준 떡볶이인데 어찌 거절하겠소… 크허어어얶흐걱헉헉쓰으으읍콜록콜록켁" },
+        B: { target: { '물': 1, '소스': 1, '떡': 3, '치즈': 1 }, dialogues: ["떡에 치즈 감싸서 먹는 게 내 최애 조합이야.", "떡 3개에 치즈 1개만 딱 사르르 녹아내리는 거지!", "다시 말해 줘? 소스, 물, 떡 3개랑 치즈 1개!"], successDialogue: "음음. 맛있다~", failDialogue: "그대가 준 떡볶이인데 어찌 거절하겠소… 크허어어얶흐걱헉헉쓰으으읍콜록콜록켁" }
+      },
+      6: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '치즈': 2 }, dialogues: ["더블 치즈 디럭스 떡볶이 하나 줘.", "치즈가 2배로 들어 있는 떡볶이 말하는 거야!", "아, 참고로 난 파는 안 먹어."], successDialogue: "수고했어. 잘 먹을게.", failDialogue: "…떡볶이 대신 햄버거를 먹을 걸 그랬어." },
+        B: { target: { '물': 1, '소스': 1, '떡': 3, '어묵': 2 }, dialogues: ["초록색이 안 보이는 떡볶이. 그림자 몫까지 3인분.", "내 말 못 알아들어?", "떡 3개, 어묵 2개. 파는 빼고."], successDialogue: "수고했어. 잘 먹을게.", failDialogue: "…떡볶이 대신 햄버거를 먹을 걸 그랬어." }
+      },
+      7: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '치즈': 1, '계란': 1 }, dialogues: ["파 없는 치즈 떡볶이에 계란 하나 올려 줘.", "…계란은 없어?", "정말로? *주방을 다시 한번 확인해 보자!"], successDialogue: "응. 꿈에서 먹은 떡볶이대로야.", failDialogue: "음… 아닌 것 같은데." },
+        B: { target: { '물': 1, '소스': 1, '떡': 1 }, dialogues: ["파 싫어… 초록색 싫어… *자고 있는 것 같다.", "어묵도 싫어…", "파도 어묵도 싫어… Zzz…"], successDialogue: "응. 꿈에서 먹은 떡볶이대로야.", failDialogue: "음… 아닌 것 같은데." }
+      },
+      8: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '토마토': 1, '파': 1 }, dialogues: ["기본 떡볶이로… 1인분 주문할게.", "나, 나는 토마토 들어간 요리를 좋아해.", "물어보는 거 아니었어…? 토마토… *주방을 다시 한번 확인해 보자!"], successDialogue: "수고했어. 저, 정말 맛있어.", failDialogue: "아… 마, 만들어줘서 고마워…" },
+        B: { target: { '물': 1, '소스': 1, '어묵': 2, '파': 2, '치즈': 1 }, dialogues: ["진짜 혁신적인 떡볶이가 생각났어…", "떡볶이인데, 떡이 안 들어가는 거야. 그러니까어묵이떡의역할을대신하고파는그뒤를채워줘,치즈는한번얹는데물이랑소스는그대로해도괜찮을것같아.", "아, 다… 다시? 어묵 둘, 파 둘, 떡은 빼고 다른 재료 하나씩."], successDialogue: "수고했어. 저, 정말 맛있어.", failDialogue: "아… 마, 만들어줘서 고마워…" }
+      },
+      9: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '파': 1 }, dialogues: ["게임하면서 먹을 간편한 떡볶이는 없을까?", "예를 들면 컵볶이라거나.", "기본 떡볶이 1인분 컵에 담아 줘."], successDialogue: "고마워. 잘 먹을게.", failDialogue: "고맙지만, 내가 말한 떡볶이는 아니야." },
+        B: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 2, '파': 1 }, dialogues: ["나는 떡보다 어묵파야.", "어묵이 떡보다 하나 더 들어갔으면 해.", "어묵 2개, 떡 1개, 파 1개. 이렇게."], successDialogue: "고마워. 잘 먹을게.", failDialogue: "고맙지만, 내가 말한 떡볶이는 아니야." }
+      },
+      10: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '치즈': 1 }, dialogues: ["치, 치즈 떡볶이로 1인분만 주세요.", "저, 그, 그리고….", "아무것도 아니에요……! *당신은 이온이 햄버거를 먹을 때에도 야채를 모조리 골라낸다는 사실을 알고 있다."], successDialogue: "감사합니다. 최, 최고의 떡볶이예요….", failDialogue: "맛있네요……!" },
+        B: { target: { '물': 2, '소스': 1, '떡': 1, '어묵': 1, '파': 1 }, dialogues: ["기, 기본 떡볶이인데, 도, 동생이 먹어야 해서… 아, 안 맵게 조리해 주실 수 있나요?", "소스보다 물이 많이 드, 들어가면 되지 않을까, 하고… 생각해 봤어요.", "물 두 개, 소스 하나, 나머지 재료 하나씩이에요."], successDialogue: "감사합니다. 최, 최고의 떡볶이예요….", failDialogue: "맛있네요……!" }
+      },
+      11: {
+        A: { target: { '물': 1, '소스': 1, '떡': 2, '파': 2 }, dialogues: ["떡볶이 1인분. 기본보다 달게 해서.", "하? 내가 레시피까지 말해줘야 해?", "떡 2개, 파 2개. 어묵 없이!"], successDialogue: "흠, 이 정도면 나쁘지 않네. 수고했어.", failDialogue: "이게 다야? 너… 내 말에 집중 안 했지?" },
+        B: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '파': 1, '치즈': 1 }, dialogues: ["치즈 떡볶이 있어?", "말 그대로야. 치즈 떡볶이.", "얼른 조리하러 가!"], successDialogue: "흠, 이 정도면 나쁘지 않네. 수고했어.", failDialogue: "이게 다야? 너… 내 말에 집중 안 했지?" }
+      },
+      12: {
+        A: { target: { '물': 5, '소스': 5, '떡': 5, '어묵': 5, '파': 5 }, dialogues: ["단체 주문도 됩니까?", "아무것도 빼지 않은 기본 떡볶이 (2)5인분 부탁드립니다.", "치즈를 제외한 모든 재료가 (2)5개씩 들어가면 될 것 같아요."], successDialogue: "감사합니다. 주문한 대로네요. 완벽합니다.", failDialogue: "혹시 이게 최선이었습니까? …아닙니다. 잘하셨습니다." },
+        B: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '파': 1, '치즈': 1 }, dialogues: ["주문하겠습니다. …잠시만요, 알림이…", "아, 됐습니다. 그러니까, 치즈… 잠시만요. 여러 개체가 있을 때 중간 사이로 자리를 잡기. 정면 공격을 피하기 위해 바로 옆 칸으로 두는 것이…", "죄송합니다. 일이 좀 바빠서… 치즈 떡볶이 1인분 주십시오."], successDialogue: "감사합니다. 주문한 대로네요. 완벽합니다.", failDialogue: "혹시 이게 최선이었습니까? …아닙니다. 잘하셨습니다." }
+      },
+      13: {
+        A: { target: { '물': 1, '소스': 1, '떡': 3, '어묵': 1, '치즈': 2 }, dialogues: ["안녕. 오늘도 고생이 많아~!", "이제 주문할게. 한 번만 말할 테니까 잘 들어…!", "떡이 세 번 들어간 떡볶이인데, 어묵은 두 번 넣었다가 국물만 우려내고 하나를 빼 줘. 파는 넣지 말고, 치즈는 두 번이야! 그럼 믿고 있을게!"], successDialogue: "와~! 이거야. 고마워!!", failDialogue: "맛없어… 다시 만들어 줘!" },
+        B: { target: { '소스': 1, '떡': 1, '어묵': 1 }, dialogues: ["떡볶이, 파랑 물 빼고 조리해 줘.", "물은 내 능력으로 채울 수 있거든, 대박이지!", "물이랑 파 빼고, 기본 떡볶이!"], successDialogue: "와~! 이거야. 고마워!!", failDialogue: "맛없어… 다시 만들어 줘!" }
+      },
+      14: {
+        A: {target: { '파': 2, '떡': 1, '물': 1, '소스': 1 }, dialogues: ["성은 떡보다 파가 좋아. 벌레도 꼭 얹어 줘.", "으음. 파 둘에 떡 하나.", "파 둘, 떡 하나, 물이랑 소스. 됐을까나."], successDialogue: "고마워, 내가 바라던 거야.", failDialogue: "……메뚜기 줄까?"},
+        B: {target: { '물': 1 }, dialogues: ["있지, 던전맛이 나는 떡볶이는 없어?", "던전맛이 나는 떡볶이….", "없으면 물이라도 마실래……."], successDialogue: "고마워, 내가 바라던 거야.", failDialogue: "……메뚜기 줄까?"}
+      },
+      15: {
+        A: {
+  target: { '떡': 2, '어묵': 2, '물': 1, '소스':1 },
+  dialogues: [
+    "옛날 전통 스타일로 떡이랑 어묵만 넣어 주라.",
+    "치즈나 파 없이 떡 2개랑 어묵 2개만 들어간 떡볶이를 말한 거야.",
+    "떡 2개, 어묵 2개. 그걸 좋아하거든. 잘 부탁할게."
+  ],
+  successDialogue: "수고했어. 고마워. 내일 학교에서 보자.",
+  failDialogue: "음. 내가 너무 어려운 주문을 했을까?"
+},
+
+        B: {
+  target: { '떡': 1, '소스': 1, '어묵': 1, '파': 1, '물': 1 },
+  dialogues: [
+    "아, 네가 주문 받고 있었구나.",
+    "친구를 고생시킬 수는 없으니까… 기본 떡볶이로 1인분 주문할게.",
+    "치즈를 제외한 모든 재료가 하나씩 들어가면 돼."
+  ],
+  successDialogue: "수고했어. 고마워. 내일 학교에서 보자.",
+  failDialogue: "음. 내가 너무 어려운 주문을 했을까?"
+}
+
+      },
+      16: {
+        A: {
+  target: { '소스': 1, '어묵': 1, '파': 1, '물': 1 },
+  dialogues: [
+    "떡은 빼 줘. 탄수화물 줄이는 중이라…",
+    "평소 조리 방식에서 떡만 빼면 될 텐데.",
+    "떡 없이 어묵 1개, 파 1개."
+  ],
+  successDialogue: "고생했어. 다음에 학교에서 봐.",
+  failDialogue: "… … 아니다."
+},
+
+        B: {
+  target: { '떡': 2, '소스': 2, '물': 2, '어묵': 2, '파': 2 },
+  dialogues: [
+    "떡볶이 1인분 주문이 타이밍: 행동이라고 가정할 경우, 내가 응원의 함성을 쓰면 너는 몇 인분을 주문 받게 되는 걸까?",
+    "【응원의 함성】 ▶ [전원]",
+    "정답은 2인분이야."
+  ],
+  successDialogue: "고생했어. 다음에 학교에서 봐.",
+  failDialogue: "… … 아니다."
+}
+
+      },
+      17: {
+        A: {
+  target: { '떡': 1, '소스': 1, '파': 1, '치즈': 1, '물': 1 },
+  dialogues: [
+    "치즈 떡볶이 1인분에 어묵 빼 줘.",
+    "치즈 떡볶이 1인분이라는 건, 치즈가 들어간 한 명이 먹을 양의 떡볶이라는 뜻이야.",
+    "…어묵 빼고 나머지 재료 하나씩 넣을래?"
+  ],
+  successDialogue: "고생 많았어. 잘 먹을게.",
+  failDialogue: "…이 시간에 복기하러 갈 걸 그랬네."
+},
+
+        B: {
+  target: { '떡': 2, '소스': 2, '물': 2, '어묵': 2, '파': 2 },
+  dialogues: [
+    "떡볶이 2인분 주문해도 될까?",
+    "운용하는 그림자가 있거든.",
+    "기본 떡볶이 2인분, 다른 거 없이."
+  ],
+  successDialogue: "고생 많았어. 잘 먹을게.",
+  failDialogue: "…이 시간에 복기하러 갈 걸 그랬네."
+}
+
+      },
+      18: {
+        A: {
+  target: { '물': 1, '어묵': 1, '파': 1 },
+  dialogues: [
+    "몸을 따뜻하게 데워주는 국물이 먹고 싶어.",
+    "…어묵이랑 파 하나씩이면 되지 않을까?",
+    "다른 건 넣으면 안 돼. 물이랑, 어묵, 파야."
+  ],
+  successDialogue: "만들어 줘서 고마워. 잘 먹을게.",
+  failDialogue: "아……. 음, 수고했어."
+},
+
+        B: {
+  target: { '떡': 1, '소스': 1, '치즈': 1, '파': 2, '물': 1 },
+  dialogues: [
+    "치즈 떡볶이… 주문할게.",
+    "그리고 파를 두 번 넣어 줬으면 해.",
+    "파 두 번, 치즈 떡볶이야."
+  ],
+  successDialogue: "만들어 줘서 고마워. 잘 먹을게.",
+  failDialogue: "아……. 음, 수고했어."
+}
+},
+
+      19: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '치즈': 2, '파': 1 }, dialogues: ["가장 예쁜 메뉴로 주세요~! 사진을 남기고 싶어서요.", "치즈를 두 번 올리면 되지 않을까 싶은데. 안 그런가요?", "들으셨죠? 치즈 두 번이에요~!"], successDialogue: "고마워요! 역시 서 가네 떡볶이예용.", failDialogue: "이것도 나쁘지는 않지만~ 혹시 피곤했나요?" },
+        B: { target: { '물': 1, '떡': 1 }, dialogues: ["떡이 씻을 차례다~를 네 글자로 하면 뭘까요?", "𝓣𝓣𝓔𝓞𝓚 𝓦𝓐𝓢𝓗𝓘𝓝𝓖 𝓣𝓤𝓡𝓝.", "아하하. 물에 떡 씻어서 주세요."], successDialogue: "고마워요! 역시 서 가네 떡볶이예용.", failDialogue: "이것도 나쁘지는 않지만~ 혹시 피곤했나요?" }
+      },
+      20: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '치즈': 1, '파': 1 }, dialogues: ["안녕. 떡볶이 한 그릇만 줄래?", "흠흠, 우리 가게의 특별 메뉴거든.", "음, 그러니까… 기본 떡볶이로 줘. 어묵은 빼구!"], successDialogue: "맛있겠다…! 잘 먹을게.", failDialogue: "이것두 이거대로 맛있네…!" }
+      },
+      21: {
+        A: { target: { '물': 1, '소스': 1, '떡': 1, '어묵': 1, '치즈': 2, '파': 1 }, dialogues: ["흠, 흠. 어디 잘 하고 있나 볼까?", "나는 치즈를 넣을까 말까 고민하다가 한 개보단 많고 세 개보단 적은 개수로 넣은 다음에, 떡은 당연히 넣을~ 줄 알았겠지만 안 넣고, 어묵은…", "장난이야. 치즈 떡볶이에 치즈 한 번 더 추가해 줘!"], successDialogue: "고마워!", failDialogue: "맛없어…" }
+      },
+      22: {
+        A: {target: { '떡': 1, '어묵': 1, '파': 1, '치즈': 1 }, dialogues: ["안녕~ 나 수석인데 여기 있는 재료 전부 다 맛보고 싶어.","어렵나? 재료 모두 하나씩 넣어 주라.","떡 1개, 어묵 1개, 파 1개, 치즈 1개, 이렇게!"],successDialogue: "고마워~ 맛있게 먹을게.",failDialogue: "음, 어딘가 아쉬운 맛인데… 만들 때 피곤했어?"},
+        B: {
+  target: { '떡': 2, '어묵': 2, '파': 1 },
+  dialogues: [
+    "친구랑 공부하며 나눠 먹을 거라… 든든하게 부탁해.",
+    "떡 2개, 어묵 2개, 파 1개, 골고루.",
+    "응? 다시 말해 줘? 떡 둘, 어묵 둘, 파 하나!"
+  ],
+  successDialogue: "고마워~ 맛있게 먹을게.",
+  failDialogue: "음, 어딘가 아쉬운 맛인데… 만들 때 피곤했어?"
+}
+
+      },
+      23: {
+        A: {
+  target: { '떡': 2, '어묵': 2, '소스': 2, '파': 2, '물': 2, '치즈': 2 },
+  dialogues: [
+    "제, 제가… 이걸 먹어도, 되, 될까요…?",
+    "저, 정말로요?",
+    "*모든 재료를 두 개씩 넣어주고 싶은 기분이 든다."
+  ],
+  successDialogue: "가, 감사, 합니다…… ㅠ//ㅠ",
+  failDialogue: "가, 감사, 합니다……"
+},
+
+        B: {
+  target: { '파': 5, '물': 1 },
+  dialogues: [
+    "저, 제, 제 능력이, 보시다시피 이런, 이런 거라…",
+    "하, 한 번만, 들어, 주시면…",
+    "*검은 형체가 파를 다섯 번, 물을 한 번 가리킨다."
+  ],
+  successDialogue: "가, 감사, 합니다…… ㅠ//ㅠ",
+  failDialogue: "가, 감사, 합니다……"
+}
+
+      },
+      24: {
+        A: {
+  target: { '떡': 2, '치즈': 2 },
+  dialogues: [
+    "깔끔하게 떡에 치즈만 올려 주십시오.",
+    "떡 2개, 치즈 2개면 충분하다는 뜻입니다.",
+    "설명이 더 필요합니까?"
+  ],
+  successDialogue: "수고 많으셨습니다. 잘 먹겠습니다.",
+  failDialogue: "이 분식집의 미래가 암담해…"
+},
+
+        B: {
+  target: { '떡': 1, '어묵': 1, '파': 1, '물': 1, '소스': 1 },
+  dialogues: [
+    "하이웨이 채용 원거리 딜러인 제게 어울리는 떡볶이로 부탁드립니다.",
+    "가장 기본적인 떡볶이 말입니다.",
+    "떡, 어묵, 파 1개씩 넣어주시면 됩니다."
+  ],
+  successDialogue: "수고 많으셨습니다. 잘 먹겠습니다.",
+  failDialogue: "이 분식집의 미래가 암담해…"
+}
+
+      },
+      25: {
+        A: { target: { '물': 1 }, dialogues: ["물 내놔.","…고양이 먹일 물.", "그냥 물이면 돼."], successDialogue: "흠. 나쁘지 않네.", failDialogue: "가라 그냥." },
+
+        B: { target: { '물': 1, '소스': 1, '떡': 2, '파': 2, '어묵': 1 }, dialogues: ["파가 많이 들어가야 국물이 시원하지.", "떡도 하나 더 넣어.", "떡이랑 파 하나씩 더. 빨리."], successDialogue: "흠. 나쁘지 않네.", failDialogue: "가라 그냥." }
+}
+    };
+
+    // 배경음악: HTML 파일과 같은 위치의 sounds/background.mp3 파일을 반복 재생합니다.
+    const backgroundMusic = new Audio('sounds/background.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.25;
+
+    function startBackgroundMusic() {
+      if (!backgroundMusic.paused) return;
+      const playback = backgroundMusic.play();
+      if (playback && typeof playback.catch === 'function') {
+        playback.catch(error => console.warn('배경음악을 재생하지 못했습니다. sounds/background.mp3 경로와 브라우저 소리 설정을 확인해 주세요.', error));
+      }
+    }
+
+    function stopBackgroundMusic() {
+      backgroundMusic.pause();
+      backgroundMusic.currentTime = 0;
+    }
+
+    // 손님 3, 5, 14의 주문 성공 효과음. 손님 14는 우선 손님 3과 같은 효과음을 사용합니다.
+    const guestSuccessSounds = {
+      3: new Audio('sounds/guest3-success.mp3'),
+      5: new Audio('sounds/guest5-success.mp3'),
+      14: new Audio('sounds/guest14-success.mp3')
+    };
+
+    function playGuestSuccessSound(guestNumber) {
+      const audio = guestSuccessSounds[guestNumber];
+      if (!audio) return;
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+        const playback = audio.play();
+        if (playback && typeof playback.catch === 'function') {
+          playback.catch(error => console.warn('효과음을 재생하지 못했습니다. 파일 경로와 브라우저 소리 설정을 확인해 주세요.', error));
+        }
+      } catch (error) {
+        console.warn('효과음 재생 오류:', error);
+      }
+    }
+
+    function startGame() {
+      document.getElementById('howto-screen').classList.add('active');
+    }
+
+    function continueToGame() {
+      startBackgroundMusic();
+      document.getElementById('howto-screen').classList.remove('active');
+      lobbyScreen.classList.add('hidden');
+      resetHiddenItems();
+      restartGame();
+    }
+
+    function startGameFromModal() {
+      startBackgroundMusic();
+      resultModal.classList.remove('active');
+      resetHiddenItems();
+      restartGame();
+    }
+
+    function goToLobby() {
+      stopBackgroundMusic();
+      if (timer) clearInterval(timer);
+      isPlaying = false;
+      resultModal.classList.remove('active');
+      document.getElementById('howto-screen').classList.remove('active');
+      lobbyScreen.classList.remove('hidden');
+    }
+
+    function resetHiddenItems() {
+      eggUnlocked = false;
+      tomatoUnlocked = false;
+      hiddenEggBtn.classList.remove('show');
+      hiddenTomatoBtn.classList.remove('show');
+    }
+
+    function startTimer() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timeLeftEl.innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function checkAndPlayNoteEffects() {
+      if (currentCustomerIndex === 3 && currentSelectedKey === 'A') {
+        if (dialogueStep === 1) {
+          playNote(NOTE_FA, 0.5, 0);
+        } else if (dialogueStep === 2) {
+          playNote(NOTE_FA, 0.4, 0);
+          playNote(NOTE_DO, 0.5, 0.35);
+        }
+      }
+    }
+
+    function nextCustomer() {
+      if (!isPlaying) return;
+
+      resetHiddenItems();
+
+      currentCustomerIndex = Math.floor(Math.random() * 25) + 1;
+      customerImg.src = GUEST_IMAGES[currentCustomerIndex];
+
+      const guestObj = GUEST_DATA[currentCustomerIndex];
+      currentSelectedKey = Math.random() < 0.5 ? 'A' : 'B';
+      currentCustomerPattern = JSON.parse(JSON.stringify(guestObj[currentSelectedKey]));
+
+      dialogueStep = 0;
+      isCookingMode = false;
+
+      dialogueOptions.classList.remove('hidden-options');
+      speechBubble.innerText = currentCustomerPattern.dialogues[dialogueStep];
+
+      resetPot();
+    }
+
+    function askPardon() {
+      if (!isPlaying || isCookingMode) return;
+
+      dialogueStep++;
+      if (dialogueStep >= currentCustomerPattern.dialogues.length) {
+        dialogueStep = currentCustomerPattern.dialogues.length - 1;
+      }
+      speechBubble.innerText = currentCustomerPattern.dialogues[dialogueStep];
+
+      checkAndPlayNoteEffects();
+
+      if (currentCustomerIndex === 7 && currentSelectedKey === 'A' &&
+          dialogueStep === currentCustomerPattern.dialogues.length - 1 && 
+          !eggUnlocked) {
+        eggUnlocked = true;
+        hiddenEggBtn.classList.add('show');
+        showPopEffect("신선한 '계란' 발견!", "#e76f51");
+      }
+
+      if (currentCustomerIndex === 8 && currentSelectedKey === 'A' &&
+          dialogueStep === currentCustomerPattern.dialogues.length - 1 && 
+          !tomatoUnlocked) {
+        tomatoUnlocked = true;
+        hiddenTomatoBtn.classList.add('show');
+        showPopEffect("상큼한 '토마토' 발견!", "#e76f51");
+      }
+    }
+
+    function confirmOrder() {
+      if (!isPlaying) return;
+      isCookingMode = true;
+
+      dialogueOptions.classList.add('hidden-options');
+      speechBubble.innerText = "기다리는 중!";
+    }
+
+    function addIngredient(ing) {
+      if (!isPlaying || !isCookingMode) return;
+      if (currentPot.length >= 8) return;
+
+      currentPot.push(ing);
+      renderPot();
+
+      potArea.classList.add('bounce');
+      setTimeout(() => potArea.classList.remove('bounce'), 100);
+    }
+
+    function updateTteokbokkiImage() {
+      const count = {};
+      currentPot.forEach(item => count[item] = (count[item] || 0) + 1);
+      const hasTteok = (count['떡'] || 0) > 0;
+      const hasEomuk = (count['어묵'] || 0) > 0;
+      const hasSauce = (count['소스'] || 0) > 0;
+      const hasCheese = (count['치즈'] || 0) > 0;
+      const hasWater = (count['물'] || 0) > 0;
+
+      let nextImage = 'bim.png';
+      let nextAlt = '빈 철판';
+
+      if (currentPot.length > 0) {
+        if (!hasTteok && hasEomuk && !hasSauce) {
+          nextImage = 'onlyeomuk.png';
+          nextAlt = '어묵만 올린 철판';
+        } else if (hasTteok && hasEomuk && hasSauce && hasCheese) {
+          nextImage = 'chetteokb.png';
+          nextAlt = '치즈 떡볶이';
+        } else if (hasTteok && hasEomuk && hasSauce) {
+          nextImage = 'tteokbok.png';
+          nextAlt = '기본 떡볶이';
+        } else if (hasTteok && hasEomuk) {
+          nextImage = 'tteokmuk.png';
+          nextAlt = '떡어묵';
+        } else if (hasSauce) {
+          nextImage = 'onlyss.png';
+          nextAlt = '소스';
+        } else if (hasWater) {
+          nextImage = 'onlywat.png';
+          nextAlt = '물';
+        } else {
+          nextImage = 'bim.png';
+          nextAlt = '재료를 올리는 중인 철판';
+        }
+      }
+
+      mainImg.onerror = () => {
+        mainImg.onerror = null;
+        mainImg.src = 'bim.png';
+      };
+      mainImg.src = nextImage;
+      mainImg.alt = nextAlt;
+
+      const foodLayer = document.getElementById('food-layer');
+      if (foodLayer) {
+        foodLayer.innerHTML = '';
+        const isIllustratedState = ['chetteokb.png','tteokbok.png','tteokmuk.png','onlyeomuk.png'].includes(nextImage);
+        if (!isIllustratedState) {
+          const positions = [[30,35],[48,27],[66,35],[40,49],[59,49],[28,62],[72,57],[50,68],[38,30],[63,67],[52,43],[74,42]];
+          currentPot.forEach((ing, index) => {
+            const piece = document.createElement('img');
+            piece.src = INGREDIENT_IMAGES[ing];
+            piece.className = 'food-piece';
+            piece.alt = ing;
+            const pos = positions[index % positions.length];
+            piece.style.left = (50 + (pos[0] - 50) * 2) + '%';
+            piece.style.top = pos[1] + '%';
+            piece.style.zIndex = String(index + 1);
+            foodLayer.appendChild(piece);
+          });
+        }
+      }
+    }
+
+    function renderPot() {
+      updateTteokbokkiImage();
+      potArea.classList.toggle('has-items', currentPot.length > 0);
+    }
+
+    function resetPot() {
+      currentPot = [];
+      renderPot();
+    }
+
+    function serveOrder() {
+      if (!isPlaying) return;
+
+      if (!isCookingMode) {
+        showPopEffect("오케이를 먼저 눌러주세요!", "#e76f51");
+        return;
+      }
+
+      const potCount = {};
+      currentPot.forEach(ing => {
+        potCount[ing] = (potCount[ing] || 0) + 1;
+      });
+
+      const targetOrder = currentCustomerPattern.target;
+      let isCorrect = true;
+
+      for (const [ing, count] of Object.entries(targetOrder)) {
+        if (potCount[ing] !== count) {
+          isCorrect = false;
+          break;
+        }
+      }
+
+      for (const [ing, count] of Object.entries(potCount)) {
+        if (!targetOrder[ing] || targetOrder[ing] !== count) {
+          isCorrect = false;
+          break;
+        }
+      }
+
+      isCookingMode = false;
+
+      if (isCorrect) {
+        if (currentCustomerIndex === 3 || currentCustomerIndex === 5 || currentCustomerIndex === 14) {
+          playGuestSuccessSound(currentCustomerIndex);
+        }
+        const points = Object.values(targetOrder).reduce((a, b) => a + b, 0) * 100;
+        score += points;
+        servedCount++;
+        scoreEl.innerText = score;
+
+        speechBubble.innerText = currentCustomerPattern.successDialogue;
+        showPopEffect(`성공! +${points}`, '#2a9d8f');
+        resetPot();
+
+        setTimeout(() => {
+          if (isPlaying) {
+            nextCustomer();
+          }
+        }, 1200);
+      } else {
+        speechBubble.innerText = currentCustomerPattern.failDialogue;
+        showPopEffect(`실패!`, '#e76f51');
+        resetPot();
+
+        setTimeout(() => {
+          if (isPlaying) {
+            nextCustomer();
+          }
+        }, 1200);
+      }
+    }
+
+    function showPopEffect(text, color) {
+      const pop = document.createElement('div');
+      pop.className = 'pop-effect';
+      pop.innerText = text;
+      pop.style.color = color;
+      pop.style.left = '60%';
+      pop.style.top = '20%';
+      document.getElementById('game-container').appendChild(pop);
+
+      setTimeout(() => pop.remove(), 800);
+    }
+
+    function endGame() {
+      clearInterval(timer);
+      isPlaying = false;
+      finalScoreEl.innerText = score;
+      servedCountEl.innerText = servedCount;
+      resultModal.classList.add('active');
+    }
+
+    function restartGame() {
+      score = 0;
+      servedCount = 0;
+      timeLeft = 100;
+      isPlaying = true;
+
+      scoreEl.innerText = '0';
+      timeLeftEl.innerText = '100';
+      resultModal.classList.remove('active');
+
+      nextCustomer();
+      startTimer();
+    }
+
+    /* 드래그 앤 드롭 조작 이벤트 초기화 */
+    (() => {
+      const stage = document.getElementById('pot-area');
+      const stations = [...document.querySelectorAll('.kitchen-object[data-ingredient]')];
+      if (!stage || !stations.length) return;
+
+      let drag = null;
+      let ghost = null;
+      let halo = null;
+      let startX = 0, startY = 0;
+
+      const move = (e) => {
+        if (!drag || !ghost) return;
+        ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+        halo.style.left = e.clientX + 'px'; halo.style.top = e.clientY + 'px';
+        const r = stage.getBoundingClientRect();
+        const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        stage.classList.toggle('drag-over', inside);
+      };
+
+      const finish = (e) => {
+        if (!drag) return;
+        const x = Number.isFinite(e?.clientX) ? e.clientX : -9999;
+        const y = Number.isFinite(e?.clientY) ? e.clientY : -9999;
+        const r = stage.getBoundingClientRect();
+        const inside = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+        if (inside && Math.hypot(x - startX, y - startY) > 8) {
+          addIngredient(drag.dataset.ingredient);
+          stage.classList.add('has-items');
+        }
+        drag.classList.remove('drag-source');
+        stage.classList.remove('drag-over');
+        ghost?.remove(); halo?.remove();
+        ghost = halo = null; drag = null;
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', finish);
+      };
+
+      stations.forEach((station) => {
+        const img = station.querySelector('img');
+        if (img) img.draggable = false;
+        station.addEventListener('pointerdown', (e) => {
+          if (e.button !== 0 && e.pointerType === 'mouse') return;
+          if (typeof isPlaying !== 'undefined' && !isPlaying) return;
+          if (typeof isCookingMode !== 'undefined' && !isCookingMode) return;
+          e.preventDefault();
+          drag = station; startX = e.clientX; startY = e.clientY;
+          station.classList.add('drag-source');
+          ghost = document.createElement('img'); ghost.className = 'drag-ghost'; ghost.src = img?.src || '';
+          halo = document.createElement('div'); halo.className = 'drag-halo';
+          document.body.append(halo, ghost);
+          move(e);
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', finish, { once: true });
+        });
+      });
+
+      window.addEventListener('pointercancel', (e) => finish(e));
+      window.addEventListener('blur', () => {
+        if (drag) finish({ clientX: -9999, clientY: -9999 });
+      });
+      document.addEventListener('dragstart', (e) => e.preventDefault());
+
+      const originalReset = window.resetPot;
+      window.resetPot = function() {
+        if (originalReset) originalReset();
+        stage.classList.remove('has-items');
+      };
+    })();
+  </script>
+</body>
+</html>
